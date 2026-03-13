@@ -5,7 +5,6 @@
 <meta charset="UTF-8">
 <title>Administrador Sorteo</title>
 <link rel="stylesheet" href="style.css">
-
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable"></script>
 </head>
@@ -15,60 +14,34 @@
 <h1>Administrador del Sorteo</h1>
 
 <div class="metrics">
-
-<div class="card">
-<h3 id="total">0</h3>
-<p>Total</p>
-</div>
-
-<div class="card">
-<h3 id="libres">0</h3>
-<p>Disponibles</p>
-</div>
-
-<div class="card">
-<h3 id="ocupados">0</h3>
-<p>Ocupados</p>
-</div>
-
-<div class="card">
-<h3 id="pagados">0</h3>
-<p>Pagados</p>
-</div>
-
+<div class="card"><h3 id="total">0</h3><p>Total</p></div>
+<div class="card"><h3 id="libres">0</h3><p>Disponibles</p></div>
+<div class="card"><h3 id="ocupados">0</h3><p>Ocupados</p></div>
+<div class="card"><h3 id="pagados">0</h3><p>Pagados</p></div>
 </div>
 
 <div class="toolbar">
-
 <input type="text" id="buscar" placeholder="Buscar número o nombre">
-
 <button onclick="filtrar('todos')">Todos</button>
 <button onclick="filtrar('libres')">Disponibles</button>
 <button onclick="filtrar('ocupados')">Ocupados</button>
 <button onclick="filtrar('pagados')">Pagados</button>
-
 <button onclick="exportarCSV()">Exportar CSV</button>
 <button onclick="generarPDF()">Exportar PDF</button>
-
 </div>
 
 <table>
-
 <thead>
 <tr>
 <th>Número</th>
 <th>Nombre</th>
 <th>Teléfono</th>
 <th>Pagado</th>
-<th>Acción</th>
 </tr>
 </thead>
-
 <tbody id="tabla"></tbody>
-
 </table>
 
 <script type="module" src="app.js"></script>
-
 </body>
 </html>
