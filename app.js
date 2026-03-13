@@ -29,7 +29,7 @@ datos=[];
 for(let key in data){
 
 datos.push({
-id:key,
+firebaseId: key,
 ...data[key]
 });
 
