@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bitácora de Registros</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="firebase-config.js"></script>
+</head>
+<body>
+  <h1>Bitácora de Registros</h1>
+  <table id="tabla">
+    <thead>
+      <tr>
+        <th>Fecha y hora</th>
+        <th>Número</th>
+        <th>Nombre</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script type="module">
+    import { db, ref, onValue } from './firebase-config.js';
+
+    const logRef = ref(db, "bitacora");
+
+    onValue(logRef, (snapshot) => {
+      const datos = snapshot.val() || {};
+      const tbody = document.querySelector("#tabla tbody");
+      tbody.innerHTML = "";
+
+      const ordenado = Object.entries(datos).sort(([a], [b]) => b.localeCompare(a));
+      ordenado.forEach(([clave, registro]) => {
+        const fila = document.createElement("tr");
+
+        const celdaFecha = document.createElement("td");
+        celdaFecha.textContent = registro.fecha || clave.replaceAll("-", ":");
+
+        const celdaNum = document.createElement("td");
+        celdaNum.textContent = registro.numero;
+
+        const celdaNombre = document.createElement("td");
+        celdaNombre.textContent = registro.nombre;
+
+        fila.appendChild(celdaFecha);
+        fila.appendChild(celdaNum);
+        fila.appendChild(celdaNombre);
+        tbody.appendChild(fila);
+      });
+    });
+  </script>
+</body>
+</html>

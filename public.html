@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Selecciona tu número</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>Selecciona tu número</h1>
+
+<div class="toolbar center">
+
+<button onclick="filtrar('todos')">Todos</button>
+<button onclick="filtrar('libres')">Disponibles</button>
+<button onclick="filtrar('ocupados')">Ocupados</button>
+
+</div>
+
+<div id="grid" class="grid"></div>
+
+<script type="module">
+
+import { db } from "./firebase-config.js";
+import {
+ref,
+onValue
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+let datos=[];
+let datosOriginal=[];
+
+const grid=document.getElementById("grid");
+
+const dbRef = ref(db, "rifa");
+
+onValue(dbRef,(snapshot)=>{
+
+const data=snapshot.val();
+
+datos=[];
+
+for(let key in data){
+
+datos.push({
+id:key,
+...data[key]
+});
+
+}
+
+datosOriginal=[...datos];
+
+renderizar(datos);
+
+});
+
+
+function renderizar(lista){
+
+grid.innerHTML="";
+
+lista.forEach(n=>{
+
+let estado="libre";
+
+if(n.nombre) estado="ocupado";
+if(n.pagado) estado="pagado";
+
+const card=document.createElement("div");
+
+card.className="numero "+estado;
+
+card.innerHTML=`
+<div class="numero-id">${n.numero}</div>
+<div class="numero-status">${estado.toUpperCase()}</div>
+`;
+
+if(!n.nombre){
+
+card.onclick=()=>{
+
+const telefono="522291325534";
+
+const mensaje=`Hola quiero el número ${n.numero} del sorteo`;
+
+window.open(
+`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`
+);
+
+};
+
+}
+
+grid.appendChild(card);
+
+});
+
+}
+
+
+window.filtrar=function(tipo){
+
+let filtrados=[...datosOriginal];
+
+if(tipo==="libres")
+filtrados=datosOriginal.filter(n=>!n.nombre);
+
+if(tipo==="ocupados")
+filtrados=datosOriginal.filter(n=>n.nombre);
+
+renderizar(filtrados);
+
+}
+
+</script>
+
+</body>
+</html>
