@@ -4,7 +4,7 @@ import {
 ref,
 onValue,
 update
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
 
 let datos=[];
@@ -27,20 +27,19 @@ const data=snapshot.val();
 
 datos=[];
 
-for(let key in data){
+data.forEach((item,index)=>{
 
 datos.push({
-firebaseId:key,
-...data[key]
+firebaseId:index,
+...item
 });
 
-}
+});
 
 renderizar(datos);
 actualizarMetricas();
 
 });
-
 
 
 function renderizar(lista){
