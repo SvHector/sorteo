@@ -3,6 +3,14 @@
 <head>
 
 <meta charset="UTF-8">
+<title>Selecciona tu número</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
 <h1>Selecciona tu número</h1>
 
 <div class="stats">
@@ -17,15 +25,6 @@
 
 <div id="grid" class="grid"></div>
 
-<link rel="stylesheet" href="style.css">
-
-</head>
-
-<body>
-
-<h1>Selecciona tu número</h1>
-
-<div id="grid" class="grid"></div>
 
 <div id="modal" class="modal">
 
@@ -37,7 +36,7 @@
 
 <input id="nombre" placeholder="Tu nombre">
 
-<div class="modal-buttons">
+<div>
 <button class="btn-primary" onclick="reservar()">Reservar</button>
 <button class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
 </div>
@@ -50,19 +49,16 @@
 <script type="module">
 
 import { db } from "./firebase-config.js";
-import { ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+import { ref,onValue,update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 let datos=[];
 let numeroActual=null;
 
 const grid=document.getElementById("grid");
 
-const dbRef = ref(db,"rifa");
+onValue(ref(db,"rifa"),(snapshot)=>{
 
-onValue(dbRef,(snapshot)=>{
-
-const data = snapshot.val();
-
+const data=snapshot.val();
 datos=[];
 
 data.forEach((item,index)=>{
@@ -75,9 +71,26 @@ firebaseId:index,
 });
 
 renderizar();
+actualizarStats();
 
 });
 
+
+function actualizarStats(){
+
+const total=datos.length;
+
+const vendidos=datos.filter(n=>n.nombre).length;
+
+const porcentaje=Math.round((vendidos/total)*100);
+
+document.getElementById("contador").innerText=
+`${vendidos} / ${total} boletos reservados`;
+
+document.getElementById("progressBar").style.width=
+porcentaje+"%";
+
+}
 
 
 function renderizar(){
@@ -101,7 +114,9 @@ card.innerHTML=`
 `;
 
 if(!n.nombre){
+
 card.onclick=()=>abrirModal(n);
+
 }
 
 grid.appendChild(card);
@@ -133,35 +148,49 @@ window.reservar=function(){
 const nombre=document.getElementById("nombre").value;
 
 if(!nombre){
+
 alert("Escribe tu nombre");
 return;
+
+}
+
+if(numeroActual.nombre){
+
+alert("Este número ya fue reservado");
+return;
+
 }
 
 update(ref(db,"rifa/"+numeroActual.firebaseId),{
+
 nombre:nombre,
 pagado:false
+
 });
 
 cerrarModal();
 
-const mensaje = `Hola, reservé el número ${numeroActual.numero} para la rifa`;
+alert("Número reservado. Ahora envía el WhatsApp para confirmar.");
 
-const telefono = "5212291325534";
 
-const mensaje = 
-`Hola 👋
+const telefono="5212291325534";
 
-Quiero reservar el número:
+const mensaje=
+`🎟️ RESERVA DE BOLETO
 
+Número:
 ${numeroActual.numero}
 
-Nombre: ${nombre}`;
+Nombre:
+${nombre}
 
-const url = "https://api.whatsapp.com/send?phone=" 
-            + telefono + 
-            "&text=" + encodeURIComponent(mensaje);
+Favor de confirmar el pago para validar la participación.`;
 
-window.open(url, "_blank");
+const url="https://api.whatsapp.com/send?phone="
++telefono+
+"&text="+encodeURIComponent(mensaje);
+
+window.open(url,"_blank");
 
 }
 
