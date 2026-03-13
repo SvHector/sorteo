@@ -121,20 +121,23 @@ window.reservar=function(){
 const nombre=document.getElementById("nombre").value;
 
 if(!nombre){
-
 alert("Escribe tu nombre");
 return;
-
 }
 
 update(ref(db,"rifa/"+numeroActual.firebaseId),{
-
 nombre:nombre,
 pagado:false
-
 });
 
 cerrarModal();
+
+const mensaje = `Hola, reservé el número ${numeroActual.numero} para la rifa`;
+
+window.open(
+`https://wa.me/52TU_NUMERO?text=${encodeURIComponent(mensaje)}`,
+"_blank"
+);
 
 }
 
