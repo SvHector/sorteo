@@ -63,7 +63,7 @@ tr.innerHTML=`
 type="text"
 value="${n.nombre ?? ''}"
 class="admin-input"
-data-id="${n.id}"
+data-id="${n.firebaseId}"
 data-field="nombre">
 </td>
 
@@ -72,22 +72,22 @@ data-field="nombre">
 type="text"
 value="${n.telefono ?? ''}"
 class="admin-input"
-data-id="${n.id}"
+data-id="${n.firebaseId}"
 data-field="telefono">
 </td>
 
 <td>
 <input value="${n.telefono||""}"
-onchange="guardarTelefono('${n.id}',this.value)">
+onchange="guardarTelefono('${n.firebaseId}',this.value)">
 </td>
 
 <td>
 <input type="checkbox" ${n.pagado?"checked":""}
-onclick="togglePagado('${n.id}',this.checked)">
+onclick="togglePagado('${n.firebaseId}',this.checked)">
 </td>
 
 <td>
-<button onclick="guardar('${n.id}')">Guardar</button>
+<button onclick="guardar('${n.firebaseId}')">Guardar</button>
 </td>
 `;
 
@@ -99,7 +99,7 @@ tabla.appendChild(tr);
 
 window.guardarNombre=function(id,valor){
 
-update(ref(db,"rifa/"+id),{
+update(ref(db,"rifa/"+numeroActual.firebaseId),{
 nombre:valor
 });
 
