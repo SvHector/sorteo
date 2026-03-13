@@ -1,21 +1,14 @@
 
 import { db } from "./firebase-config.js";
-
-import {
-ref,
-onValue,
-update
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 let datos=[];
 
 const tabla=document.getElementById("tabla");
-
 const total=document.getElementById("total");
 const libres=document.getElementById("libres");
 const ocupados=document.getElementById("ocupados");
 const pagados=document.getElementById("pagados");
-
 const buscar=document.getElementById("buscar");
 
 const dbRef=ref(db,"rifa");
@@ -23,20 +16,17 @@ const dbRef=ref(db,"rifa");
 onValue(dbRef,(snapshot)=>{
 
 const data=snapshot.val();
-
 datos=[];
 
 for(let key in data){
-
 datos.push({
-firebaseId: key,
+firebaseId:key,
 ...data[key]
 });
-
 }
 
 renderizar(datos);
-metricas();
+actualizarMetricas();
 
 });
 
@@ -49,7 +39,6 @@ lista.forEach(n=>{
 const tr=document.createElement("tr");
 
 let estado="libre";
-
 if(n.nombre) estado="ocupado";
 if(n.pagado) estado="pagado";
 
@@ -59,35 +48,20 @@ tr.innerHTML=`
 <td>${n.numero}</td>
 
 <td>
-<input 
-type="text"
-value="${n.nombre ?? ''}"
-class="admin-input"
+<input class="nombreInput"
 data-id="${n.firebaseId}"
-data-field="nombre">
+value="${n.nombre||""}">
 </td>
 
 <td>
-<input 
-type="text"
-value="${n.telefono ?? ''}"
-class="admin-input"
+<input class="telefonoInput"
 data-id="${n.firebaseId}"
-data-field="telefono">
+value="${n.telefono||""}">
 </td>
 
 <td>
-<input value="${n.telefono||""}"
-onchange="guardarTelefono('${n.firebaseId}',this.value)">
-</td>
-
-<td>
-<input type="checkbox" ${n.pagado?"checked":""}
-onclick="togglePagado('${n.firebaseId}',this.checked)">
-</td>
-
-<td>
-<button onclick="guardar('${n.firebaseId}')">Guardar</button>
+<input type="checkbox" class="pagadoCheck"
+data-id="${n.firebaseId}" ${n.pagado?"checked":""}>
 </td>
 `;
 
@@ -97,48 +71,36 @@ tabla.appendChild(tr);
 
 }
 
-window.guardarNombre=function(id,valor){
+document.addEventListener("blur",(e)=>{
 
-update(ref(db,"rifa/"+numeroActual.firebaseId),{
-nombre:valor
+if(e.target.classList.contains("nombreInput")){
+update(ref(db,"rifa/"+e.target.dataset.id),{ nombre:e.target.value });
+}
+
+if(e.target.classList.contains("telefonoInput")){
+update(ref(db,"rifa/"+e.target.dataset.id),{ telefono:e.target.value });
+}
+
+},true);
+
+document.addEventListener("change",(e)=>{
+
+if(e.target.classList.contains("pagadoCheck")){
+update(ref(db,"rifa/"+e.target.dataset.id),{ pagado:e.target.checked });
+}
+
 });
 
-}
-
-window.guardarTelefono=function(id,valor){
-
-update(ref(db,"rifa/"+id),{
-telefono:valor
-});
-
-}
-
-window.togglePagado=function(id,valor){
-
-update(ref(db,"rifa/"+id),{
-pagado:valor
-});
-
-}
-
-window.guardar=function(){
-alert("Guardado");
-}
-
-function metricas(){
+function actualizarMetricas(){
 
 total.innerText=datos.length;
 
-let l=0;
-let o=0;
-let p=0;
+let l=0,o=0,p=0;
 
 datos.forEach(n=>{
-
 if(!n.nombre) l++;
 if(n.nombre) o++;
 if(n.pagado) p++;
-
 });
 
 libres.innerText=l;
@@ -151,14 +113,9 @@ window.filtrar=function(tipo){
 
 let filtrados=[...datos];
 
-if(tipo==="libres")
-filtrados=datos.filter(n=>!n.nombre);
-
-if(tipo==="ocupados")
-filtrados=datos.filter(n=>n.nombre);
-
-if(tipo==="pagados")
-filtrados=datos.filter(n=>n.pagado);
+if(tipo==="libres") filtrados=datos.filter(n=>!n.nombre);
+if(tipo==="ocupados") filtrados=datos.filter(n=>n.nombre);
+if(tipo==="pagados") filtrados=datos.filter(n=>n.pagado);
 
 renderizar(filtrados);
 
@@ -182,13 +139,10 @@ window.exportarCSV=function(){
 let csv="Numero,Nombre,Telefono,Pagado\n";
 
 datos.forEach(n=>{
-
 csv+=`${n.numero},${n.nombre||""},${n.telefono||""},${n.pagado?"SI":"NO"}\n`;
-
 });
 
 const blob=new Blob([csv]);
-
 const a=document.createElement("a");
 
 a.href=URL.createObjectURL(blob);
@@ -199,8 +153,7 @@ a.click();
 
 window.generarPDF=function(){
 
-const { jsPDF }=window.jspdf;
-
+const { jsPDF } = window.jspdf;
 const doc=new jsPDF();
 
 const filas=datos.map(n=>[
