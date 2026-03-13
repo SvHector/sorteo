@@ -59,8 +59,21 @@ tr.innerHTML=`
 <td>${n.numero}</td>
 
 <td>
-<input value="${n.nombre||""}"
-onchange="guardarNombre('${n.id}',this.value)">
+<input 
+type="text"
+value="${n.nombre ?? ''}"
+class="admin-input"
+data-id="${n.id}"
+data-field="nombre">
+</td>
+
+<td>
+<input 
+type="text"
+value="${n.telefono ?? ''}"
+class="admin-input"
+data-id="${n.id}"
+data-field="telefono">
 </td>
 
 <td>
