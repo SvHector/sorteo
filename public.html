@@ -1,10 +1,12 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
 <title>Selecciona tu número</title>
+
 <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
@@ -13,19 +15,28 @@
 
 <div id="grid" class="grid"></div>
 
+
+<!-- MODAL -->
+
 <div id="modal" class="modal">
+
 <div class="modal-content">
 
 <h2>Reservar número</h2>
 
-<p id="numeroSeleccionado"></p>
+<p id="numeroSeleccionado" class="numero-modal"></p>
 
 <input id="nombre" placeholder="Tu nombre">
-<button onclick="reservar()">Reservar</button>
-<button onclick="cerrarModal()">Cancelar</button>
+
+<div class="modal-buttons">
+<button class="btn-primary" onclick="reservar()">Reservar</button>
+<button class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
+</div>
 
 </div>
+
 </div>
+
 
 <script type="module">
 
@@ -53,6 +64,7 @@ renderizar();
 
 });
 
+
 function renderizar(){
 
 grid.innerHTML="";
@@ -60,6 +72,7 @@ grid.innerHTML="";
 datos.forEach(n=>{
 
 let estado="libre";
+
 if(n.nombre) estado="ocupado";
 if(n.pagado) estado="pagado";
 
@@ -69,7 +82,7 @@ card.className="numero "+estado;
 
 card.innerHTML=`
 <div class="numero-id">${n.numero}</div>
-<div class="numero-status">${estado}</div>
+<div class="numero-status">${estado.toUpperCase()}</div>
 `;
 
 if(!n.nombre){
@@ -82,30 +95,40 @@ grid.appendChild(card);
 
 }
 
+
 function abrirModal(n){
 
 numeroActual=n;
+
 document.getElementById("modal").style.display="flex";
 document.getElementById("numeroSeleccionado").innerText=n.numero;
 
 }
 
+
 window.cerrarModal=function(){
+
 document.getElementById("modal").style.display="none";
+
 }
+
 
 window.reservar=function(){
 
 const nombre=document.getElementById("nombre").value;
 
 if(!nombre){
-alert("Completa los datos");
+
+alert("Escribe tu nombre");
 return;
+
 }
 
 update(ref(db,"rifa/"+numeroActual.firebaseId),{
+
 nombre:nombre,
 pagado:false
+
 });
 
 cerrarModal();
