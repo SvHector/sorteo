@@ -1,34 +1,19 @@
+
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
 <meta charset="UTF-8">
 <title>Selecciona tu número</title>
-
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
 <h1>Selecciona tu número</h1>
 
-<div class="toolbar center">
-
-<button onclick="filtrar('todos')">Todos</button>
-<button onclick="filtrar('libres')">Disponibles</button>
-<button onclick="filtrar('ocupados')">Ocupados</button>
-
-</div>
-
 <div id="grid" class="grid"></div>
 
-
-<!-- MODAL -->
-
 <div id="modal" class="modal">
-
 <div class="modal-content">
 
 <h2>Reservar número</h2>
@@ -36,67 +21,47 @@
 <p id="numeroSeleccionado"></p>
 
 <input id="nombre" placeholder="Tu nombre">
-
 <input id="telefono" placeholder="Tu teléfono">
 
 <button onclick="reservar()">Reservar</button>
-
 <button onclick="cerrarModal()">Cancelar</button>
 
 </div>
-
 </div>
-
 
 <script type="module">
 
 import { db } from "./firebase-config.js";
-
-import {
-ref,
-onValue,
-update
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
+import { ref,onValue,update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 let datos=[];
-let datosOriginal=[];
 let numeroActual=null;
 
 const grid=document.getElementById("grid");
 
-const dbRef = ref(db, "rifa");
-
-onValue(dbRef,(snapshot)=>{
+onValue(ref(db,"rifa"),(snapshot)=>{
 
 const data=snapshot.val();
-
 datos=[];
 
 for(let key in data){
-
 datos.push({
-id:key,
+firebaseId:key,
 ...data[key]
 });
-
 }
 
-datosOriginal=[...datos];
-
-renderizar(datos);
+renderizar();
 
 });
 
-
-function renderizar(lista){
+function renderizar(){
 
 grid.innerHTML="";
 
-lista.forEach(n=>{
+datos.forEach(n=>{
 
 let estado="libre";
-
 if(n.nombre) estado="ocupado";
 if(n.pagado) estado="pagado";
 
@@ -106,13 +71,11 @@ card.className="numero "+estado;
 
 card.innerHTML=`
 <div class="numero-id">${n.numero}</div>
-<div class="numero-status">${estado.toUpperCase()}</div>
+<div class="numero-status">${estado}</div>
 `;
 
 if(!n.nombre){
-
 card.onclick=()=>abrirModal(n);
-
 }
 
 grid.appendChild(card);
@@ -121,24 +84,17 @@ grid.appendChild(card);
 
 }
 
-
 function abrirModal(n){
 
 numeroActual=n;
-
 document.getElementById("modal").style.display="flex";
-
 document.getElementById("numeroSeleccionado").innerText=n.numero;
 
 }
 
-
 window.cerrarModal=function(){
-
 document.getElementById("modal").style.display="none";
-
 }
-
 
 window.reservar=function(){
 
@@ -146,46 +102,17 @@ const nombre=document.getElementById("nombre").value;
 const telefono=document.getElementById("telefono").value;
 
 if(!nombre || !telefono){
-
 alert("Completa los datos");
-
 return;
-
 }
 
-update(ref(db,"rifa/"+numeroActual.id),{
-
+update(ref(db,"rifa/"+numeroActual.firebaseId),{
 nombre:nombre,
 telefono:telefono,
 pagado:false
-
 });
 
-
 cerrarModal();
-
-const mensaje=`Hola, reservé el número ${numeroActual.numero}`;
-
-window.open(
-
-`https://wa.me/52XXXXXXXXXX?text=${encodeURIComponent(mensaje)}`
-
-);
-
-}
-
-
-window.filtrar=function(tipo){
-
-let filtrados=[...datosOriginal];
-
-if(tipo==="libres")
-filtrados=datosOriginal.filter(n=>!n.nombre);
-
-if(tipo==="ocupados")
-filtrados=datosOriginal.filter(n=>n.nombre);
-
-renderizar(filtrados);
 
 }
 
