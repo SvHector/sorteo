@@ -134,10 +134,22 @@ cerrarModal();
 
 const mensaje = `Hola, reservé el número ${numeroActual.numero} para la rifa`;
 
-window.open(
-`https://wa.me/5212291325534?text=${encodeURIComponent(mensaje)}`,
-"_blank"
-);
+const telefono = "5212291325534";
+
+const mensaje = 
+`Hola 👋
+
+Quiero reservar el número:
+
+${numeroActual.numero}
+
+Nombre: ${nombre}`;
+
+const url = "https://api.whatsapp.com/send?phone=" 
+            + telefono + 
+            "&text=" + encodeURIComponent(mensaje);
+
+window.open(url, "_blank");
 
 }
 
